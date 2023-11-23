@@ -5,6 +5,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import pickle
+import sys
+base_dir = '/home/jake/Dropbox/fire_infrasound'
+sys.path.append(f'{base_dir}/code')
+from fire_day_utils import get_t1_t2, get_semblance_ticks
 
 def beam_stack_spectrum(st, sx, sy, win_length_sec = 10):
     print(f'({sx:0.4f}, {sy:0.4f})')
@@ -90,9 +94,10 @@ def calc_num_windows(data_length_sec, win_length_sec, overlap):
     return 1 + int(np.floor((data_length_sec - win_length_sec) / (win_length_sec * (1 - overlap)) - eps))
 
 #%% define stream to process
-station = 'QST'
-t1 = UTCDateTime('2023-10-06T12:00:00')
-t2 = UTCDateTime('2023-10-06T23:59:59')
+station = 'VPT'
+t1_t2 = get_t1_t2(station)
+t1 = UTCDateTime(f'2023-10-06T{t1_t2[0]}:00')
+t2 = UTCDateTime(f'2023-10-06T{t1_t2[1]}:59')
 path = '/home/jake/2023-10-20_FireDataDownload/mseed_to_share/2023-10-06*'
 st = obspy.read(path).merge()
 st.trim(t1-20, t2+20) # pad to eliminate potential filter artifacts
@@ -119,12 +124,12 @@ st = obspy.Stream([st[i] for i in w])
 #%% run the beam stack spectrogram
 #for station in ['TOP', 'QST']
 
-S = pd.read_csv(f'beamform_results/10-06T12:00_10-06T23:59_{station}_fl4_fh8_winlen60_winfrac1.csv')
+S = pd.read_csv(f'beamform_results/{t1.strftime("%m-%dT%H:%M")}_{t2.strftime("%m-%dT%H:%M")}_{station}_fl4_fh8_winlen60_winfrac1.csv')
 
 ## Following test shows using a higher welch ratio (shorter window) loses frequency resolution but 
 ## doesn't visibly improve noise reduction. So, stick with welch ratio 5
 for welch_ratio in [5]:#, 10, 15, 20, 30]: 
-    filename = f'beamform_results/beamstack_10-06T12:00_10-06T23:59_{station}_fl4_fh8_welch{welch_ratio}.pkl'
+    filename = f'beamform_results/beamstack_{t1.strftime("%m-%dT%H:%M")}_{t2.strftime("%m-%dT%H:%M")}_{station}_fl4_fh8_welch{welch_ratio}.pkl'
     if True:
         sg = beam_stack_spectrogram(st, S.backazimuth+180, S.slowness, win_length_sec = 60, welch_ratio=welch_ratio)
         with open(filename, 'wb') as f:
@@ -133,6 +138,7 @@ for welch_ratio in [5]:#, 10, 15, 20, 30]:
         with open(filename, 'rb') as f:
             sg = pickle.load(f)
     print(sg['freqs'][0,0])
+    #%%
     plt.figure()
     plt.subplot(2,1,1)
     cleanbf.image(np.log10(sg['power']), ((S['t'] % 1) * 24)-6, np.log10(sg['freqs'][0,:]), crosshairs = False)

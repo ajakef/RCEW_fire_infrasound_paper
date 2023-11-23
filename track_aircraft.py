@@ -43,9 +43,10 @@ for station in station_list:
     coords_dict['lon'].append(np.mean([s.longitude for s in inv if s.code[:len(station)] == station]))
     coords_dict['z'].append(np.mean([s.elevation for s in inv if s.code[:len(station)] == station]))
 
+for key in coords_dict.keys():
+    coords_dict[key] = np.array(coords_dict[key])
 ######################################
 for station in station_list:
-    #station = 'TOP'
     lat_sta = coords_dict['lat'][coords_dict['station'] == station]
     lon_sta = coords_dict['lon'][coords_dict['station'] == station]
     z_sta = coords_dict['z'][coords_dict['station'] == station]
@@ -66,7 +67,14 @@ heli_track.to_csv('helicopter_data/heli_track.csv', index = False)
 
 
 
+#%%OLD CODE BELOW
 
+
+
+
+
+
+#%%
 
 #####################################################
 ## code to read historical data files (readsb-hist and individual planes).

@@ -5,6 +5,9 @@ Created on Tue Nov 21 16:06:45 2023
 
 @author: jake
 """
+import numpy as np
+import cleanbf
+import obspy
 
 def get_semblance_ticks(station):
     return {'TOP':[0.03, 0.1, 0.3, 1], 
@@ -25,7 +28,7 @@ def beam_stack_spectrum(st, sx, sy, win_length_sec = 10):
     weight = cleanbf.calc_weights(cleanbf.make_steering_vectors(st, freqs, [sx], [sy]))[:,0,0,:]
     P = np.abs(np.einsum('ki,ijk,kj->k', weight.conj(), cross_spec, weight)) # i, j: stations; k: freq.
     semblance = P/np.einsum('iik->k', cross_spec)
-    return {'freqs':freqs, 'power':P, 'semblance':semblance}
+    return {'freqs':freqs, 'power':P, 'semblance':semblance, 'N':len(st)}
 
 def beam_stack_spectrogram(st, forward_az, slowness, win_length_sec = 40, welch_ratio = 4, overlap = 0):
     num_windows = calc_num_windows(st[0].stats.endtime - st[0].stats.starttime, win_length_sec, overlap)

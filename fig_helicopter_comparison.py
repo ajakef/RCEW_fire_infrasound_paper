@@ -23,14 +23,14 @@ def annotate_plot(text = False):
     for x in [16+41/60, 15+12/60, 14+23/60, 13+12/60]:
         plt.axvline(x)
 #%%
-for station in ['CHKB', 'JDNA', 'JDNB', 'JDSA', 'JDSB', 'QST', 'TOP', 'VPT']:
+for station in ['TOP']:#['CHKB', 'JNA', 'JNB', 'JSA', 'JSB', 'QST', 'TOP', 'VPT']:
     t1_t2 = get_t1_t2(station)
     heli_track = pd.read_csv('helicopter_data/heli_track.csv')
     bf_fn = f'beamform_results/10-06T{t1_t2[0]}_10-06T{t1_t2[1]}_{station}_fl4_fh8_winlen60_winfrac1.csv'
     bf = pd.read_csv(bf_fn)
     w_heli = np.where(heli_track[f'{station}_dist'] < 10000)[0]
     
-    plt.figure(figsize = (9, 6.5))
+    plt.figure(figsize = (7.5, 8.5))
     plt.subplot(2,1,1)
     yticks = [0, 90, 180, 270, 360]
     plt.yticks(yticks)
@@ -39,12 +39,15 @@ for station in ['CHKB', 'JDNA', 'JDNB', 'JDSA', 'JDSB', 'QST', 'TOP', 'VPT']:
     l1, = plt.plot(time_hours(heli_track['t'][w_heli]), heli_track[f'{station}_az'][w_heli], 'k.')
     w_inf = np.where(bf.slowness < 3.5)[0]
     l2, = plt.plot((bf.t[w_inf] % 1)*24-6, bf.backazimuth[w_inf] % 360, 'r.')
-    
+    if station == 'TOP':
+        plt.fill_between([6, 18], [-90, -90], [450,450], color = 'lightgray')
+        plt.fill_between([6, 18], [33, 33], [187,187], color = 'white')
+    plt.ylim([0,360])
     plt.xlim([6, 18])
     plt.xlabel('Local Time (hours)')
     plt.ylabel('Direction of Arrival ($\degree$ from N)')
     plt.legend([l1, l2], ['Helicopter', 'Infrasound'], loc = 'upper right', framealpha = 1)
-    plt.title(f'4-8 Hz infrasound backazimuth, {station} array')# (40 sensors, 210 m x 130 m)
+    plt.title(f'A. 4-8 Hz infrasound backazimuth, {station} array', loc = 'left')# (40 sensors, 210 m x 130 m)
     
     plt.subplot(2,1,2)
     plt.yticks(yticks)
@@ -52,16 +55,24 @@ for station in ['CHKB', 'JDNA', 'JDNB', 'JDSA', 'JDSB', 'QST', 'TOP', 'VPT']:
         plt.axhline(y, color = 'gray', linestyle = '--')
     l1, = plt.plot(time_hours(heli_track['t'][w_heli]), heli_track[f'{station}_az'][w_heli], 'k.')
     l2, = plt.plot((bf.t[w_inf] % 1)*24-6, bf.backazimuth[w_inf] % 360, 'r.')
-    plt.xlim([13, 18])
+    if station == 'TOP':
+        plt.fill_between([6, 18], [-90, -90], [450,450], color = 'lightgray')
+        plt.fill_between([6, 18], [33, 33], [187,187], color = 'white')
+    plt.ylim([0,360])
+    plt.xlim([12.45, 18])
     plt.xlabel('Local Time (hours)')
     plt.ylabel('Direction of Arrival ($\degree$ from N)')
     plt.legend((l1, l2), ['Helicopter', 'Infrasound'], loc = 'upper right', framealpha = 1)
-    plt.title(f'4-8 Hz infrasound backazimuth, {station} array (zoom-in)')# (40 sensors, 210 m x 130 m)
+    plt.title(f'B. 4-8 Hz infrasound backazimuth, {station} array (zoom-in)', loc = 'left')# (40 sensors, 210 m x 130 m)
     #annotate_plot()
     plt.tight_layout()
     plt.savefig(f'figures/helicopter_comparison_{station}_fl4_fh8.png')
+    if station == 'TOP':
+        plt.savefig(f'paper/helicopter_comparison_{station}_fl4_fh8.png')
+        
     #%% compare to 25-32 Hz band
-    
+###########################################################################
+## Helicopter infrasound
 for station in ['TOP']:
     t1_t2 = get_t1_t2(station)
     heli_track = pd.read_csv('helicopter_data/heli_track.csv')
@@ -78,8 +89,10 @@ for station in ['TOP']:
     l1, = plt.plot(time_hours(heli_track['t'][w_heli]), heli_track[f'{station}_az'][w_heli], 'k.')
     w_inf = np.where(bf.slowness < 3.5)[0]
     l2, = plt.plot((bf.t[w_inf] % 1)*24-6, bf.backazimuth[w_inf] % 360, 'r.')
-    
+    plt.fill_between([6, 18], [-90, -90], [450,450], color = 'lightgray')
+    plt.fill_between([6, 18], [33, 33], [187,187], color = 'white')
     plt.xlim([6, 18])
+    plt.ylim([0, 360])
     plt.xlabel('Local Time (hours)')
     plt.ylabel('Direction of Arrival (degrees)')
     plt.legend([l1, l2], ['Helicopter', 'Infrasound'], loc = 'upper right', framealpha = 1)
@@ -91,7 +104,10 @@ for station in ['TOP']:
         plt.axhline(y, color = 'gray', linestyle = '--')
     l1, = plt.plot(time_hours(heli_track['t'][w_heli]), heli_track[f'{station}_az'][w_heli], 'k.')
     l2, = plt.plot((bf.t[w_inf] % 1)*24-6, bf.backazimuth[w_inf] % 360, 'r.')
+    plt.fill_between([6, 18], [-90, -90], [450,450], color = 'lightgray')
+    plt.fill_between([6, 18], [33, 33], [187,187], color = 'white')
     plt.xlim([13, 18])
+    plt.ylim([0, 360])
     plt.xlabel('Local Time (hours)')
     plt.ylabel('Direction of Arrival (degrees)')
     plt.legend((l1, l2), ['Helicopter', 'Infrasound'], loc = 'upper right', framealpha = 1)
@@ -194,3 +210,23 @@ plt.semilogy(1/A[wt])
 plt.figure()
 plt.plot(peakfreq[wt[1:]], np.diff(1/A[wt])*A[wt[1:]], 'k.')
 plt.axhline(0)
+
+
+
+#%% plot helicopter track on day 1 and day 2
+t = [obspy.UTCDateTime(x) for x in heli_track.t]
+w = np.argmax(np.diff(t))
+plt.figure()
+plt.plot(heli_track.lon[:w], heli_track.lat[:w], 'r-')
+plt.plot(heli_track.lon[w:], heli_track.lat[w:], 'k-')
+plt.figure()
+plt.subplot(2,2,1)
+plt.plot(t[:w], heli_track.lon[:w], 'k.')
+plt.subplot(2,2,3)
+plt.plot(t[:w], heli_track.lat[:w], 'k.')
+plt.subplot(2,2,2)
+plt.plot(t[(w+1):], heli_track.lon[(w+1):], 'k.')
+plt.subplot(2,2,4)
+plt.plot(t[(w+1):], heli_track.lat[(w+1):], 'k.')
+
+# inspection of these plots shows that the helicopter started flying tracks that look like burning at 10/6 18:46 and 10/7 17:04 and stopped at 10/6 23:55 and 10/7 20:20

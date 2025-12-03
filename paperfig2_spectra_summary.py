@@ -40,7 +40,6 @@ plt.subplot(2,1,1)
 for i, station in enumerate(array_reps):
     tr = st_filt.select(station = station.split('.')[0]).slice(t1, t2)[0]
     t = np.arange(len(tr.data)) * tr.stats.delta / 3600 + 4 # hours MDT
-    #plt.plot(t, rescale(tr.data) + i, color = colors[i])
     plt.plot(t, tr.data/5 + len(array_reps)-i, color = colors[i], marker = ',')
     plt.text(4.5, len(array_reps)-i + 0.1, station)
 
@@ -58,9 +57,7 @@ plt.title('A. Infrasound Time Series', loc = 'left')
 
 ## B (bottom right): Semblance spectra for early morning and noon for each array
 plt.subplot(2,2,3)
-#def F(s): return s/(1-s) * N # F-stat
 def F(s): return (s - 1/N) * N/(N-1) # "Adjusted coherence"
-#def getN(station, starttime): return np.sum(np.array([np.std(obspy.signal.detrend.simple(x.data)) for x in obspy.read(f'{base_dir}/mseed_burnday_QC/2023-10-06T00*{station}*').slice(starttime, starttime +time_interval_length)]) > 3)
 
 for i, station in enumerate(arrays):
     filename = f'{base_dir}/beamform_results/beamstack_10-06T12:00_10-06T23:59_{station}_fl4_fh8_welch5.pkl'
@@ -103,49 +100,3 @@ plt.title('C. Pre-fire Spectra', loc = 'left')
 
 plt.tight_layout()
 plt.savefig(f'{base_dir}/paper/paperfig_spectra_summary.png', dpi = 300)
-
-
-
-
-
-
-
-
-
-
-#plt.legend()
-
-## SKIP THIS, it's a mess. (bottom middle): Beam-stack spectra for early morning and noon for each array
-#plt.subplot(2,3,5)
-#def get_spectrum(station, starttime):
-#    st_tmp = obspy.read(f'{base_dir}/mseed_burnday_QC/2023-10-06T00*{station}*').slice(starttime, starttime +time_interval_length)
-#    st_tmp.detrend()
-#    st_tmp = obspy.Stream([tr for tr in st_tmp if tr.std() > 1])
-    
-#for i, station in enumerate(arrays):
-    
-    
-#    filename = f'{base_dir}/beamform_results/beamstack_results_AFE/beamstack_10-06T12:00_10-06T23:59_{station}_fl4_fh8_welch5.pkl'
-#    with open(filename, 'rb') as f:
-#        sg = pickle.load(f)
-#    w = np.where((sg['t_mid'] >= starttime_morning) & (sg['t_mid'] <= (starttime_morning + time_interval_length)))[0]
-#    #N = getN(station, starttime_morning)
-#    plt.loglog(sg['freqs'][0,:], np.mean(sg['power'][w,:], axis=0)*(3.5012e-3)**2, color = colors[i], linestyle = '-')
-#    w = np.where((sg['t_mid'] >= starttime_noon) & (sg['t_mid'] <= (starttime_noon + time_interval_length)))[0]
-#    plt.loglog(sg['freqs'][0,:], np.mean(sg['power'][w,:], axis=0)*(3.5012e-3)**2, color = colors[i], linestyle = ':')
-
-
-    
-# try plotting (s-1/N) * (N/(N-1))
-#s/(s+n)
-
-#(s+n)/s
-
-#n/s
-
-#s/n
-
-#1/(1/S - 1)
-
-#S/(1 - S)
-#find . -name "*JD*" -exec bash -c 'mv "$0" "${0/JD/J}"' {} \; # change JD to J in all filenames in folder

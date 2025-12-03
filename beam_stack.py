@@ -11,7 +11,6 @@ sys.path.append(f'{base_dir}/code')
 from fire_day_utils import get_t1_t2, get_semblance_ticks, beam_stack_spectrum, beam_stack_spectrogram, apply_function_windows, calc_num_windows
 base_dir = '..' # run this script from the 'code/' folder
 #%% define stream to process
-station = 'QST'
 for station in ['TOP', 'QST', 'JDNA', 'JDNB', 'JDSA', 'JDSB']:
     t1_t2 = get_t1_t2(station)
     t1 = UTCDateTime(f'2023-10-06T{t1_t2[0]}:00')
@@ -27,7 +26,7 @@ for station in ['TOP', 'QST', 'JDNA', 'JDNB', 'JDSA', 'JDSB']:
     cleanbf.add_inv_coords(st, inv)
 
 
-    #%% drop high-noise traces, balancing large number of sensors vs dropping highest-noise sensors
+    ## drop high-noise traces, balancing large number of sensors vs dropping highest-noise sensors
     sd = np.sort(st.std())
     total_power = sd**2
     num_stations = np.arange(len(st))+1
@@ -39,19 +38,11 @@ for station in ['TOP', 'QST', 'JDNA', 'JDNB', 'JDSA', 'JDSB']:
     w = np.where(np.array(st.std()) <= max_sd_to_keep)[0]
     st = obspy.Stream([st[i] for i in w])
     
-    #%% run the beam stack spectrogram
+    %% run the beam stack spectrogram
     #for station in ['TOP', 'QST']
     
     S = pd.read_csv(f'{base_dir}/beamform_results/{t1.strftime("%m-%dT%H:%M")}_{t2.strftime("%m-%dT%H:%M")}_{station}_fl4_fh8_winlen60_winfrac1.csv')
     
-    ## scaling check. Note that cleanbf spectra scaling is tested in tests.py.
-    if False:
-        sg = beam_stack_spectrogram(st, S.backazimuth+180, S.slowness, win_length_sec = 60, welch_ratio=1)
-        plt.loglog(sg['freqs'][0,:],  np.mean(sg['power'], axis=0)) # plot mean beam-stack power spectrum
-        cs = cleanbf.calc_cross_spectrum(st, win_length_sec = 60)
-        for i in range(cs[0].shape[0]):
-            plt.loglog(cs[2], cs[0][i,i,:])
-
     ## Following test shows using a higher welch ratio (shorter window) loses frequency resolution but 
     ## doesn't visibly improve noise reduction. So, stick with welch ratio 5
     #for welch_ratio in [5]:#, 10, 15, 20, 30]:
@@ -65,7 +56,7 @@ for station in ['TOP', 'QST', 'JDNA', 'JDNB', 'JDSA', 'JDSB']:
         with open(filename, 'rb') as f:
             sg = pickle.load(f)
     print(sg['freqs'][0,0])
-    #%%
+
     plt.figure()
     plt.subplot(2,1,1)
     cleanbf.image(np.log10(sg['power']), ((S['t'] % 1) * 24)-6, np.log10(sg['freqs'][0,:]), crosshairs = False)

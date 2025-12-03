@@ -13,7 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import sys
-base_dir = '/home/jake/Dropbox/fire_infrasound'
+base_dir = '..'
 sys.path.append(f'{base_dir}/code')
 from fire_day_utils import get_t1_t2, get_semblance_ticks, get_power_ticks
 

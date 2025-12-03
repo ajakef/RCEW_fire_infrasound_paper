@@ -6,17 +6,17 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import pickle
 import sys
-base_dir = '/home/jake/Dropbox/fire_infrasound'
 sys.path.append(f'{base_dir}/code')
-from fire_day_utils import get_t1_t2, get_semblance_ticks, beam_stack_spectrum, beam_stack_spectrogram, apply_function_windows, calc_num_windows
 
+from fire_day_utils import get_t1_t2, get_semblance_ticks, beam_stack_spectrum, beam_stack_spectrogram, apply_function_windows, calc_num_windows
+base_dir = '..' # run this script from the 'code/' folder
 #%% define stream to process
 station = 'QST'
 for station in ['TOP', 'QST', 'JDNA', 'JDNB', 'JDSA', 'JDSB']:
     t1_t2 = get_t1_t2(station)
     t1 = UTCDateTime(f'2023-10-06T{t1_t2[0]}:00')
     t2 = UTCDateTime(f'2023-10-06T{t1_t2[1]}:59')
-    path = '/home/jake/2023-10-20_FireDataDownload/mseed_to_share/2023-10-06*'
+    path = f'{base_dir}/data/infrasound/2023-10-06*'
     st = obspy.read(path).merge()
     st.trim(t1-20, t2+20) # pad to eliminate potential filter artifacts
     st = st.select(station=f'{station}*')
@@ -56,7 +56,7 @@ for station in ['TOP', 'QST', 'JDNA', 'JDNB', 'JDSA', 'JDSB']:
     ## doesn't visibly improve noise reduction. So, stick with welch ratio 5
     #for welch_ratio in [5]:#, 10, 15, 20, 30]:
     welch_ratio = 5
-    filename = f'beamform_results/beamstack_{t1.strftime("%m-%dT%H:%M")}_{t2.strftime("%m-%dT%H:%M")}_{station}_fl4_fh8_welch{welch_ratio}.pkl'
+    filename = f'{base_dir}/beamform_results/beamstack_{t1.strftime("%m-%dT%H:%M")}_{t2.strftime("%m-%dT%H:%M")}_{station}_fl4_fh8_welch{welch_ratio}.pkl'
     if True:
         sg = beam_stack_spectrogram(st, S.backazimuth+180, S.slowness, win_length_sec = 60, welch_ratio=welch_ratio)
         with open(filename, 'wb') as f:

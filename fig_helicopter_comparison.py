@@ -4,7 +4,7 @@ import xmltodict, obspy, glob
 import numpy as np
 from obspy.geodetics.base import gps2dist_azimuth
 import sys
-base_dir = '/home/jake/Dropbox/fire_infrasound'
+base_dir = '..' # run this script inside the 'code/' folder
 sys.path.append(f'{base_dir}/code')
 from fire_day_utils import get_t1_t2, get_semblance_ticks
 
@@ -25,8 +25,8 @@ def annotate_plot(text = False):
 #%%
 for station in ['TOP']:#['CHKB', 'JNA', 'JNB', 'JSA', 'JSB', 'QST', 'TOP', 'VPT']:
     t1_t2 = get_t1_t2(station)
-    heli_track = pd.read_csv('helicopter_data/heli_track.csv')
-    bf_fn = f'beamform_results/10-06T{t1_t2[0]}_10-06T{t1_t2[1]}_{station}_fl4_fh8_winlen60_winfrac1.csv'
+    heli_track = pd.read_csv(f'{base_dir}/data/helicopter_data/heli_track.csv')
+    bf_fn = f'{base_dir}/beamform_results/10-06T{t1_t2[0]}_10-06T{t1_t2[1]}_{station}_fl4_fh8_winlen60_winfrac1.csv'
     bf = pd.read_csv(bf_fn)
     w_heli = np.where(heli_track[f'{station}_dist'] < 10000)[0]
     
@@ -64,19 +64,17 @@ for station in ['TOP']:#['CHKB', 'JNA', 'JNB', 'JSA', 'JSB', 'QST', 'TOP', 'VPT'
     plt.ylabel('Direction of Arrival ($\degree$ from N)')
     plt.legend((l1, l2), ['Helicopter', 'Infrasound'], loc = 'upper right', framealpha = 1)
     plt.title(f'B. 4-8 Hz infrasound backazimuth, {station} array (zoom-in)', loc = 'left')# (40 sensors, 210 m x 130 m)
-    #annotate_plot()
     plt.tight_layout()
-    plt.savefig(f'figures/helicopter_comparison_{station}_fl4_fh8.png')
-    if station == 'TOP':
-        plt.savefig(f'paper/helicopter_comparison_{station}_fl4_fh8.png')
+    plt.savefig(f'{base_dir}/figures/helicopter_comparison_{station}_fl4_fh8.png')
+
         
     #%% compare to 25-32 Hz band
 ###########################################################################
 ## Helicopter infrasound
 for station in ['TOP']:
     t1_t2 = get_t1_t2(station)
-    heli_track = pd.read_csv('helicopter_data/heli_track.csv')
-    bf_fn = f'beamform_results/10-06T{t1_t2[0]}_10-06T{t1_t2[1]}_{station}_fl25_fh32_winlen60_winfrac1.csv'
+    heli_track = pd.read_csv(f'{base_dir}/data/helicopter_data/heli_track.csv')
+    bf_fn = f'{base_dir}/data/beamform_results/10-06T{t1_t2[0]}_10-06T{t1_t2[1]}_{station}_fl25_fh32_winlen60_winfrac1.csv'
     bf = pd.read_csv(bf_fn)
     w_heli = np.where(heli_track[f'{station}_dist'] < 10000)[0]
     

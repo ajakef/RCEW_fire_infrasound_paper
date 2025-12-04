@@ -6,12 +6,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import pickle
 import sys
+base_dir = '..' # run this script from the 'code/' folder
 sys.path.append(f'{base_dir}/code')
 
 from fire_day_utils import get_t1_t2, get_semblance_ticks, beam_stack_spectrum, beam_stack_spectrogram, apply_function_windows, calc_num_windows
-base_dir = '..' # run this script from the 'code/' folder
-#%% define stream to process
-for station in ['TOP', 'QST', 'JDNA', 'JDNB', 'JDSA', 'JDSB']:
+
+#%% loop through stations and make a beam-stack spectrogram for each
+for station in ['JNA', 'JNB', 'JSA', 'JSB', 'QST', 'TOP']:
     t1_t2 = get_t1_t2(station)
     t1 = UTCDateTime(f'2023-10-06T{t1_t2[0]}:00')
     t2 = UTCDateTime(f'2023-10-06T{t1_t2[1]}:59')
@@ -22,7 +23,7 @@ for station in ['TOP', 'QST', 'JDNA', 'JDNB', 'JDSA', 'JDSB']:
     st = obspy.Stream([tr for tr in st if type(tr.data) is np.ndarray])
     st.filter('highpass', freq = 0.333, corners = 6)
     st.trim(t1, t2)
-    inv = obspy.read_inventory(f'{base_dir}/coordinates/RCEW_inventory.xml')
+    inv = obspy.read_inventory(f'{base_dir}/data/coordinates/RCEW_inventory.xml')
     cleanbf.add_inv_coords(st, inv)
 
 
@@ -38,7 +39,7 @@ for station in ['TOP', 'QST', 'JDNA', 'JDNB', 'JDSA', 'JDSB']:
     w = np.where(np.array(st.std()) <= max_sd_to_keep)[0]
     st = obspy.Stream([st[i] for i in w])
     
-    %% run the beam stack spectrogram
+    ## run the beam stack spectrogram
     #for station in ['TOP', 'QST']
     
     S = pd.read_csv(f'{base_dir}/beamform_results/{t1.strftime("%m-%dT%H:%M")}_{t2.strftime("%m-%dT%H:%M")}_{station}_fl4_fh8_winlen60_winfrac1.csv')

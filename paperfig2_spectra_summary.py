@@ -9,7 +9,7 @@ import riversound
 base_dir = '..'
 sys.path.append(f'{base_dir}/code')
 from fire_day_utils import get_t1_t2, get_semblance_ticks, get_power_ticks
-
+#%%
 arrays = ['JNA', 'JSB', 'QST', 'TOP']#, 'CHKB', 'VPT']
 array_reps = ['JNA2', 'JSB1', 'QST01', 'TOP01']#, 'CHKB1', 'VPTA.01']
 
@@ -20,7 +20,7 @@ starttime_noon = obspy.UTCDateTime('2023-10-06_18:00')
 
 st = obspy.Stream()
 for station in array_reps:
-    tr = obspy.read(f'{base_dir}/mseed_burnday_QC/*{station}*DF.mseed')[0]
+    tr = obspy.read(f'{base_dir}/data/infrasound/2023-10-06*{station}*DF.mseed')[0]
     tr.data = tr.data * 3.5012e-3
     st += tr
 st_filt = st.copy()
@@ -99,4 +99,4 @@ plt.title('C. Pre-fire Spectra', loc = 'left')
 ## below 2 Hz, these spectra basically span the LNM-HNM range. For 2-8 Hz, they are firmly in the middle of the two. Gem self-noise is below actual noise for f<2 Hz (TOP and QST morning), f<20 Hz (others in morning), and always at noon.
 
 plt.tight_layout()
-plt.savefig(f'{base_dir}/paper/paperfig_spectra_summary.png', dpi = 300)
+plt.savefig(f'{base_dir}/figures/paperfig_spectra_summary.png', dpi = 300)

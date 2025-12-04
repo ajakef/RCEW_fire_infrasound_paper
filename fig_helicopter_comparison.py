@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-import xmltodict, obspy, glob
+import obspy
 import numpy as np
 from obspy.geodetics.base import gps2dist_azimuth
 import sys
@@ -23,9 +23,9 @@ def annotate_plot(text = False):
     for x in [16+41/60, 15+12/60, 14+23/60, 13+12/60]:
         plt.axvline(x)
 #%%
-for station in ['TOP']:#['CHKB', 'JNA', 'JNB', 'JSA', 'JSB', 'QST', 'TOP', 'VPT']:
+for station in ['JNA', 'JNB', 'JSA', 'JSB', 'TOP']: #, 'QST', 'VPT', 'CHKB']
     t1_t2 = get_t1_t2(station)
-    heli_track = pd.read_csv(f'{base_dir}/data/helicopter_data/heli_track.csv')
+    heli_track = pd.read_csv(f'{base_dir}/data/helicopter_data/helicopter_station_azimuths.csv')
     bf_fn = f'{base_dir}/beamform_results/10-06T{t1_t2[0]}_10-06T{t1_t2[1]}_{station}_fl4_fh8_winlen60_winfrac1.csv'
     bf = pd.read_csv(bf_fn)
     w_heli = np.where(heli_track[f'{station}_dist'] < 10000)[0]

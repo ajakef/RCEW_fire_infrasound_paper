@@ -4,6 +4,7 @@ from obspy.signal.array_analysis import array_processing
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
 base_dir = '..'
 sys.path.append(f'{base_dir}/code')
 
@@ -82,7 +83,6 @@ def add_inv_coords(st, inv):
 ## loop through frequency bands
 t1 = UTCDateTime('2023-10-06T12:00:00')
 t2 = UTCDateTime('2023-10-06T23:59:59')
-#path = '/home/jake/2023-10-20_FireDataDownload/mseed_to_share/2023-10-06*'
 infrasound_files = f'{base_dir}/data/infrasound/2023-10-06*'
 st = obspy.read(infrasound_files).merge().slice(t1, t2)
 st = obspy.Stream([tr for tr in st if type(tr.data) is np.ndarray])
@@ -90,12 +90,10 @@ st.filter('highpass', freq = 0.05, corners = 6)
 inv = obspy.read_inventory(f'{base_dir}/data/coordinates/RCEW_inventory.xml')
 add_inv_coords(st, inv)
 #%%
-station_list = ['JDNA', 'JDNB', 'JDSA', 'JDSB', 'QST', 'TOP']
-#station_list = ['VPT', 'CHKB'] # did not record any fire infrasound; not used in paper
+station_list = ['JNA', 'JNB', 'JSA', 'JSB', 'QST', 'TOP']
+#station_list = ['VPT', 'CHKB'] # fire infrasound not observed at VPT & CHKB
 fl_list = [0.125, 0.25, 0.5, 1, 2, 4, 8, 16, 25]
 fh_list = [0.25, 0.5, 1, 2, 4, 8, 16, 32, 32]
-fl_list = [16]
-fh_list = [32]
 win_len = 60
 win_frac = 1
 skip = []
@@ -119,7 +117,7 @@ for station in station_list:
         F = ap_to_df(array_processing(st_sta, win_len = win_len, win_frac = win_frac, sll_x = -4, slm_x = 4, sll_y = -4, slm_y = 4, sl_s = 0.1, semb_thres = 0, vel_thres = 0, frqlow = fl, frqhigh = fh, stime = t1, etime = t2, prewhiten = False, store = store), filename)    
 #%%
 ########
-## plot results
+## plot results--this is just for quick visualization and does not make figures for the paper
 
 for station in station_list:
     fn_head = glob.glob(f'../beamform_results/10-06*{station}*csv')[0].split(station)[0]

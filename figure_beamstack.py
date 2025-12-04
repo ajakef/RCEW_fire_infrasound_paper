@@ -29,9 +29,8 @@ def plot_bf_result(b, style = 'k.'):
             plt.axvline(x)
         plt.title(titles[i-1])
 
-base_dir = '/home/jake/Dropbox/fire_infrasound/'
 #%% loop through stations and make a back-azimuth/beamstack figure for each
-for station in ['CHKB', 'JDNA', 'JDNB', 'JDSA', 'JDSB', 'QST', 'TOP', 'VPT']:
+for station in ['JNA', 'JNB', 'JSA', 'JSB', 'QST', 'TOP']: #, 'CHKB', 'VPT']
     semblance_ticks = get_semblance_ticks(station)
     t1_t2 = get_t1_t2(station)
     power_ticks = get_power_ticks(station)
@@ -106,3 +105,4 @@ for station in ['CHKB', 'JDNA', 'JDNB', 'JDSA', 'JDSB', 'QST', 'TOP', 'VPT']:
     fig.tight_layout()
     
     fig.savefig(f'{base_dir}/figures/beamstack_{station}.png')
+    print(f'{base_dir}/figures/beamstack_{station}.png')

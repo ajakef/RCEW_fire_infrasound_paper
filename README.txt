@@ -6,5 +6,5 @@ Setup:
 
 Running the code:
 1. Run beamform.py to create the files in beamform_results/. Other code files require this output to exist before running them. Does not save any figures.
-2. Run beamstack.py to create the beam-stack spectrograms and save results. Does not save any figures.
+2. Run beam_stack.py to create the beam-stack spectrograms and save results. Does not save any figures.
 3. Run the other files to analyze data and produce figures.
